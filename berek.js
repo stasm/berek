@@ -1,7 +1,7 @@
 (function(window, undefined) {
 
-	var Config = {
-		bindings: {
+    var Config = {
+        bindings: {
             'p1-right': 'RIGHT_ARROW',
             'p1-left': 'LEFT_ARROW',
             'p1-up': 'UP_ARROW',
@@ -9,9 +9,9 @@
             'p2-left': 'A',
             'p2-up': 'W',
             'halt': 'SPACE',
-		},
+        },
         debug: true,
-	};
+    };
     function Debug() {
         this._fps = document.getElementById('fps');
         this._frame_time = document.getElementById('frame-time');
@@ -35,121 +35,121 @@
                 Game.pause();
         },
     }
-	var System = {
+    var System = {
         debug: null,
-		fps: 60,
+        fps: 60,
         tick: null,
-		width: 480,
-		height: 320,
-		viewport: null,
-		ctx: null,
+        width: 480,
+        height: 320,
+        viewport: null,
+        ctx: null,
 
-		init: function init() {
-			this.initViewport();
-			this.initContext();
-			this.readConfig(Config);
+        init: function init() {
+            this.initViewport();
+            this.initContext();
+            this.readConfig(Config);
             this.debug = new Debug();
             this.tick = 1000 / this.fps;
-			Input.initKeyboard();
-			Game.init();
-		},
-		initViewport: function initViewport() {
-			this.viewport = document.getElementById('viewport');
-			this.viewport.width = this.width;
-			this.viewport.height = this.height;
-		},
-		initContext: function initContext() {
-			this.ctx = this.viewport.getContext('2d');
-		},
-		readConfig: function readConfig(config) {
-			for (action in config.bindings) {
-				var key = config.bindings[action];
-				Input.bind(key, action);
-			}
-		},
-	};
+            Input.initKeyboard();
+            Game.init();
+        },
+        initViewport: function initViewport() {
+            this.viewport = document.getElementById('viewport');
+            this.viewport.width = this.width;
+            this.viewport.height = this.height;
+        },
+        initContext: function initContext() {
+            this.ctx = this.viewport.getContext('2d');
+        },
+        readConfig: function readConfig(config) {
+            for (action in config.bindings) {
+                var key = config.bindings[action];
+                Input.bind(key, action);
+            }
+        },
+    };
 
-	var Input = {
-		keys: {
+    var Input = {
+        keys: {
             'SPACE': 32,
-			'LEFT_ARROW': 37,
-			'UP_ARROW': 38,
-			'RIGHT_ARROW': 39,
-			'DOWN_ARROW': 40,
-			'A': 65,
-			'D': 68,
-			'S': 83,
-			'W': 87,
-		},
-		bindings: {},
-		current_actions: {},
-		initKeyboard: function() {
-			window.addEventListener('keydown', this.keydown.bind(this), false);
-			window.addEventListener('keyup', this.keyup.bind(this), false);
-		},
-		keydown: function(event) {
-			var code = event.keyCode;
-			var action = this.bindings[code];
-			if (action) {
-				this.current_actions[action] = true;
-				event.stopPropagation();
-				event.preventDefault();
-			}
-		},
-		keyup: function(event) {
-			var code = event.keyCode;
-			var action = this.bindings[code];
-			if (action) {
-				this.current_actions[action] = false;
-				event.stopPropagation();
-				event.preventDefault();
-			}
-		},
-		bind: function(key, action) {
-			var code = this.keys[key];
-			this.bindings[code] = action;
-		},
-		current: function(action) {
-			return this.current_actions[action];
-		},
-	};
+            'LEFT_ARROW': 37,
+            'UP_ARROW': 38,
+            'RIGHT_ARROW': 39,
+            'DOWN_ARROW': 40,
+            'A': 65,
+            'D': 68,
+            'S': 83,
+            'W': 87,
+        },
+        bindings: {},
+        current_actions: {},
+        initKeyboard: function() {
+            window.addEventListener('keydown', this.keydown.bind(this), false);
+            window.addEventListener('keyup', this.keyup.bind(this), false);
+        },
+        keydown: function(event) {
+            var code = event.keyCode;
+            var action = this.bindings[code];
+            if (action) {
+                this.current_actions[action] = true;
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        },
+        keyup: function(event) {
+            var code = event.keyCode;
+            var action = this.bindings[code];
+            if (action) {
+                this.current_actions[action] = false;
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        },
+        bind: function(key, action) {
+            var code = this.keys[key];
+            this.bindings[code] = action;
+        },
+        current: function(action) {
+            return this.current_actions[action];
+        },
+    };
 
-	var Game = {
+    var Game = {
         _map: null,
         _collision_map: null,
-		_entities: [],
-		_interval: null,
+        _entities: [],
+        _interval: null,
         _frame_time: null,
         _current_time: null,
         _accumulator: null,
 
-		init: function init() {
+        init: function init() {
             // map
             this._map = new Map();
             this._collision_map = new CollisionMap();
             // entities
-			this._entities.push(new Entity('p1', 384, 64,
+            this._entities.push(new Entity('p1', 384, 64,
                                            'assets/blue-right.png',
                                            'assets/blue-left.png'));
-			this._entities.push(new Entity('p2', 64, 64,
+            this._entities.push(new Entity('p2', 64, 64,
                                            'assets/red-right.png',
                                            'assets/red-left.png'));
             // go
             this._current_time = Date.now();
             this.start();
-		},
+        },
         start: function start() {
-			this._interval = window.setInterval(this.loop.bind(this), 1000 / System.fps);
+            this._interval = window.setInterval(this.loop.bind(this), 1000 / System.fps);
         },
         pause: function pause() {
             window.clearInterval(this._interval);
         },
         clear: function clear() {
-			var ctx = System.ctx;
-			ctx.fillStyle = 'rgba(255,255,255,0.2)';
-			ctx.fillRect(0, 0, System.width, System.height);
+            var ctx = System.ctx;
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillRect(0, 0, System.width, System.height);
         },
-		loop: function loop() {
+        loop: function loop() {
             if (Config.debug) {
                 System.debug.display();
                 System.debug.check_for_halt();
@@ -166,7 +166,7 @@
                 }
             }
             this.render();
-		},
+        },
         integrate: function integrate() {
             for (var i=0, entity; entity = this._entities[i]; i++) {
                 entity.integrate();
@@ -179,7 +179,7 @@
                 entity.render();
             }
         },
-	};
+    };
 
     var Gravity = {
         constant: 16, // pixels per square second
@@ -231,10 +231,10 @@
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ],
         render_tile: function render_tile(code, i, j) {
-			var ctx = System.ctx;
+            var ctx = System.ctx;
             var fill = 255 - code * 66;
-			ctx.fillStyle = 'rgb('+fill+','+fill+','+fill+')';
-			ctx.fillRect(i * this.tile_size.x, j * this.tile_size.y,
+            ctx.fillStyle = 'rgb('+fill+','+fill+','+fill+')';
+            ctx.fillRect(i * this.tile_size.x, j * this.tile_size.y,
                          this.tile_size.x, this.tile_size.y);
         },
         render: function render() {
@@ -290,13 +290,13 @@
         image: null,
         flipped: null,
         render: function render(x, y, flipped) {
-			var ctx = System.ctx;
+            var ctx = System.ctx;
             var img = flipped ? this.flipped : this.image;
-			ctx.drawImage(img, x, y);
+            ctx.drawImage(img, x, y);
         },
     };
 
-	function Entity(p, pos_x, pos_y, img_right, img_left) {
+    function Entity(p, pos_x, pos_y, img_right, img_left) {
         this._jumping = true;
         this._facing_right = true;
         this.p = p;
@@ -304,10 +304,10 @@
             x: pos_x,
             y: pos_y,
         }
-		this.prev_pos = {
-			x: 0,
-			y: 0,
-		};
+        this.prev_pos = {
+            x: 0,
+            y: 0,
+        };
         this.vel = {
             x: 0,
             y: 0,
@@ -316,11 +316,11 @@
             x: 512,
             y: 512,
         };
-		this.size = {
-			x: 16,
-			y: 16,
-		};
-		this.speed = {
+        this.size = {
+            x: 16,
+            y: 16,
+        };
+        this.speed = {
             x: 192, // pixels per second
             y: 256,
         };
@@ -329,9 +329,9 @@
             x: 0,
             y: 0,
         };
-	};
+    };
 
-	Entity.prototype = {
+    Entity.prototype = {
         is_jumping: function is_jumping(bool) {
             if (bool === undefined)
                 return this._jumping;
@@ -346,17 +346,17 @@
         get_vel: function get_vel(dir) {
             return Math.min(this.vel[dir], this.max_vel[dir]) / System.fps;
         },
-		render: function draw() {
+        render: function draw() {
             this.img.render(this.pos.x, this.pos.y, this.is_flipped());
-		},
-		integrate: function update() {
+        },
+        integrate: function update() {
             this.prev_pos.x = this.pos.x;
             this.prev_pos.y = this.pos.y;
             // adjust velocity
             Gravity.pull(this);
-			if (Input.current(this.p + '-right')) this.move('right');
-			if (Input.current(this.p + '-left')) this.move('left');
-			if (Input.current(this.p + '-up')) this.jump();
+            if (Input.current(this.p + '-right')) this.move('right');
+            if (Input.current(this.p + '-left')) this.move('left');
+            if (Input.current(this.p + '-up')) this.jump();
             // update position based on velocity
             this.pos.x += this.get_vel('x');
             this.pos.y += this.get_vel('y');
@@ -370,17 +370,17 @@
                 // no collision, it's airborne
                 this.is_jumping(true);
             }
-		},
-		move: function move(direction) {
-			if (direction == 'right') {
+        },
+        move: function move(direction) {
+            if (direction == 'right') {
                 this.is_flipped(false);
                 this.vel.x = this.speed.x;
             }
-			if (direction == 'left') {
+            if (direction == 'left') {
                 this.is_flipped(true);
                 this.vel.x = - this.speed.x;
             }
-		},
+        },
         jump: function jump() {
             if (this.is_jumping()) {
                 if (this.vel.y < 0) {
@@ -397,8 +397,8 @@
             this.vel.x = 0;
             this.vel.y = 0;
         },
-	};
+    };
 
-	window.addEventListener("DOMContentLoaded", System.init.bind(System), false);
+    window.addEventListener("DOMContentLoaded", System.init.bind(System), false);
 
 })(window);
